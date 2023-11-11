@@ -1,6 +1,6 @@
 # Lab 1
 
-- [Lab 1](#lab-1)
+- [Lab 1](#)
   - [Lesson 1: Visual Studio Code editor experience](#lesson-1-visual-studio-code-editor-experience)
     - [Step 1: Create lab one working folder](#step-1-create-lab-one-working-folder)
     - [Step 2: Install the Terraform extension for Visual Studio Code](#step-2-install-the-terraform-extension-for-visual-studio-code)
@@ -46,7 +46,7 @@ The scenario of Lab 1 is to deploy an application gateway to Azure. An Azure App
 
 For the Lab 1 scenario, a Virtual Network contains two subnets **Frontend** and **Backend**. In the **Frontend** subnet, you will deploy an Application Gateway using the Web Application Firewall SKU. A public IP address exposes the Application Gateway to the Internet. Browsers can communicate with the Application Gateway over HTTP port 80. The application gateway then forwards HTTP(80) requests to the backend pool, consisting of a Linux VM with the lightweight NGINX server installed. This server is located in the **Backend** subnet and exposed to the application gateway via a Public IP.
 
-![Architecture diagram](media/architecture_diagram_lab_1.png)
+![Architecture diagram](media/architecture_diagram_challenge.png)
 
 ## Lesson 1: Visual Studio Code editor experience
 
@@ -188,7 +188,7 @@ The **variables.tf** file contains definitions, descriptions, and default values
     variable "resource_group_name" {
         description = "Name of the resource group"
         type        = string
-        default     = "terraform_lab_1"
+        default     = "terraform_challenge"
     }
 
     variable "preferred_location" {
@@ -207,7 +207,7 @@ The **main.tf** file holds the definitions of the resources to be deployed. To b
 2. In the **main.tf** file, define the resource group deployment with the following code and save the file:
 
     ```terraform
-    resource "azurerm_resource_group" "lab_1" {
+    resource "azurerm_resource_group" "challenge" {
         location = var.preferred_location
         name     = var.resource_group_name
     }
@@ -221,7 +221,7 @@ The **main.tf** file holds the definitions of the resources to be deployed. To b
     }
     ```
 
-4. The **AzureRM** provider contains a resource type **azurerm_resource_group** that represents a resource group in Azure. Terraform will create this group with the default values of the location and name variables located in the **variables.tf** file. The local name, **lab_1**, refers to the specific instance of the resource throughout the remainder of the project, ex. **azurerm_resource_group.lab_1.name** refers to the name of the resource group deployed with the local name **lab_1**.
+4. The **AzureRM** provider contains a resource type **azurerm_resource_group** that represents a resource group in Azure. Terraform will create this group with the default values of the location and name variables located in the **variables.tf** file. The local name, **challenge**, refers to the specific instance of the resource throughout the remainder of the project, ex. **azurerm_resource_group.challenge.name** refers to the name of the resource group deployed with the local name **challenge**.
 
 ## Lesson 3: Authenticate to Azure
 
@@ -325,15 +325,15 @@ Once satisfied with the execution plan, apply the configuration into Azure using
 
 2. Terraform displays the execution plan and prompts for approval. When prompted to perform the actions, type `yes` and press <kbd>Enter</kbd>.
 
-3. Terraform will now apply the configuration. First, review the output, and once completed, verify the existence of the resource group in the Azure portal (select Resource Groups and search for **terraform_lab_1**).
+3. Terraform will now apply the configuration. First, review the output, and once completed, verify the existence of the resource group in the Azure portal (select Resource Groups and search for **terraform_challenge**).
 
     ![The terminal window displays the output of Terraform apply. Yes is typed at the prompt. The terminal window displays the output indicating Terraform created the resource group.](media/terminal_prompt_terraform_apply.png "terraform apply")
 
-    ![The Azure Portal displays with the terraform_lab_1 resource group highlighted.](media/portal-new-rg.png "terraform_lab_1 resource group")
+    ![The Azure Portal displays with the terraform_challenge resource group highlighted.](media/portal-new-rg.png "terraform_challenge resource group")
 
 ### Step 6: Terraform destroy: Remove the configuration
 
-To remove all objects managed by the current configuration, utilize the `[terraform destroy](https://www.terraform.io/cli/commands/destroy)` command. For example, issuing this command will delete the **terraform_lab_1** resource group from Azure.
+To remove all objects managed by the current configuration, utilize the `[terraform destroy](https://www.terraform.io/cli/commands/destroy)` command. For example, issuing this command will delete the **terraform_challenge** resource group from Azure.
 
 1. In the terminal window, execute the following command to destroy objects managed by the current configuration.
 
@@ -345,11 +345,11 @@ To remove all objects managed by the current configuration, utilize the `[terraf
 
     ![The terminal window displays the output of Terraform destroy. Yes is typed at the prompt.](media/terminal_prompt_terraform_destroy.png "terraform destroy prompt")
 
-3. Terraform will now destroy the configuration. Review the output, and once completed, verify the resource group is no longer in the Azure portal (select Resource Groups and search for **terraform_lab_1**).
+3. Terraform will now destroy the configuration. Review the output, and once completed, verify the resource group is no longer in the Azure portal (select Resource Groups and search for **terraform_challenge**).
 
     ![The terminal window displays the output indicating Terraform destroyed the resource group.](media/terraform_destroy_success.png "Terraform destroy")
 
-    ![The Azure Portal displays with the terraform_lab_1 resource group not found.](media/portal-destroyed-rg.png "terraform_lab_1 resource group destroyed")
+    ![The Azure Portal displays with the terraform_challenge resource group not found.](media/portal-destroyed-rg.png "terraform_challenge resource group destroyed")
 
 ## Lesson 5: Define the Application Gateway architecture using IaC
 
@@ -363,23 +363,23 @@ The application gateway scenario requires a virtual network and two subnets. The
     # virtual network and associated subnets setup
     # Create virtual network
     resource "azurerm_virtual_network" "vnet" {
-        name                = "vnet-lab-1"
+        name                = "vnet-"
         address_space       = ["10.0.0.0/16"]
-        location            = azurerm_resource_group.lab_1.location
-        resource_group_name = azurerm_resource_group.lab_1.name
+        location            = azurerm_resource_group.challenge.location
+        resource_group_name = azurerm_resource_group.challenge.name
     }
 
     # Create subnets
     resource "azurerm_subnet" "backend" {
         name                 = "backend"
-        resource_group_name  = azurerm_resource_group.lab_1.name
+        resource_group_name  = azurerm_resource_group.challenge.name
         virtual_network_name = azurerm_virtual_network.vnet.name
         address_prefixes     = ["10.0.1.0/24"]
     }
 
     resource "azurerm_subnet" "frontend" {
         name                 = "frontend"
-        resource_group_name  = azurerm_resource_group.lab_1.name
+        resource_group_name  = azurerm_resource_group.challenge.name
         virtual_network_name = azurerm_virtual_network.vnet.name
         address_prefixes     = ["10.0.2.0/24"]
     }
@@ -391,7 +391,7 @@ The application gateway scenario requires a virtual network and two subnets. The
 
     ```terraform
     ...
-        resource_group_name  = azurerm_resource_group.lab_1.name
+        resource_group_name  = azurerm_resource_group.challenge.name
     ...
     ```
 
@@ -409,9 +409,9 @@ You need a web server (or application server) to serve content. In this scenario
     # Static public IP for the backend web vm
     resource "azurerm_public_ip" "publicip-vm" {
         allocation_method   = "Static"
-        location            = azurerm_resource_group.lab_1.location
-        name                = "pip-lab-1-vm"
-        resource_group_name = azurerm_resource_group.lab_1.name
+        location            = azurerm_resource_group.challenge.location
+        name                = "pip--vm"
+        resource_group_name = azurerm_resource_group.challenge.name
         sku                 = "Standard"
     }
     ```
@@ -432,8 +432,8 @@ You need a web server (or application server) to serve content. In this scenario
     # Network security group (NSG)
     resource "azurerm_network_security_group" "nsg" {
         name                = "nsg-backend-web"
-        location            = azurerm_resource_group.lab_1.location
-        resource_group_name = azurerm_resource_group.lab_1.name
+        location            = azurerm_resource_group.challenge.location
+        resource_group_name = azurerm_resource_group.challenge.name
     }
 
     # Allow inbound SSH communication over TCP port 22
@@ -447,7 +447,7 @@ You need a web server (or application server) to serve content. In this scenario
         destination_port_range      = "22"
         source_address_prefix       = "*"
         destination_address_prefix  = "*"
-        resource_group_name         = azurerm_resource_group.lab_1.name
+        resource_group_name         = azurerm_resource_group.challenge.name
         network_security_group_name = azurerm_network_security_group.nsg.name
     }
 
@@ -462,7 +462,7 @@ You need a web server (or application server) to serve content. In this scenario
         destination_port_range      = "80"
         source_address_prefix       = "*"
         destination_address_prefix  = "*"
-        resource_group_name         = azurerm_resource_group.lab_1.name
+        resource_group_name         = azurerm_resource_group.challenge.name
         network_security_group_name = azurerm_network_security_group.nsg.name
     }
     ```
@@ -480,9 +480,9 @@ The virtual machine's network interface must also be associated with the network
     ```terraform
     # Create and configure the backend web server VM network interface
     resource "azurerm_network_interface" "nic" {
-        location            = azurerm_resource_group.lab_1.location
+        location            = azurerm_resource_group.challenge.location
         name                = "nic-backend-vm"
-        resource_group_name = azurerm_resource_group.lab_1.name
+        resource_group_name = azurerm_resource_group.challenge.name
 
         ip_configuration {
             name                          = "vm-nic-config"
@@ -514,10 +514,10 @@ The backend web server virtual machine will deploy with an Ubuntu server image. 
     ```terraform
     # Create the backend web server virtual machine
     resource "azurerm_linux_virtual_machine" "vm" {
-        location                        = azurerm_resource_group.lab_1.location
+        location                        = azurerm_resource_group.challenge.location
         name                            = "backend-webserver-vm"
         network_interface_ids           = [azurerm_network_interface.nic.id]
-        resource_group_name             = azurerm_resource_group.lab_1.name
+        resource_group_name             = azurerm_resource_group.challenge.name
         size                            = "Standard_DS1_v2"
         disable_password_authentication = false
         admin_password                  = "Password1234!"
@@ -571,9 +571,9 @@ In the application gateway scenario, it is necessary to be able to make requests
     # Static public IP for the application gateway
     resource "azurerm_public_ip" "publicip-ag" {
         allocation_method   = "Static"
-        location            = azurerm_resource_group.lab_1.location
-        name                = "pip-lab-1-ag"
-        resource_group_name = azurerm_resource_group.lab_1.name
+        location            = azurerm_resource_group.challenge.location
+        name                = "pip--ag"
+        resource_group_name = azurerm_resource_group.challenge.name
         sku                 = "Standard"
     }
     ```
@@ -589,7 +589,7 @@ In Terraform, the `locals` block allows for defining values that can be used mul
     ```terraform
     # Define naming values for use through the application gateway configuration
     locals {
-        application_gateway_name       = "agw-lab-1"
+        application_gateway_name       = "agw-"
         backend_address_pool_name      = "${local.application_gateway_name}-beap"
         frontend_port_name             = "${local.application_gateway_name}-feport"
         frontend_ip_configuration_name = "${local.application_gateway_name}-feip"
@@ -616,8 +616,8 @@ The web application firewall uses the [OWASP 3.1 rule set](https://github.com/co
     # Create and configure the Application Gateway
     resource "azurerm_application_gateway" "ag" {
         name                = local.application_gateway_name
-        resource_group_name = azurerm_resource_group.lab_1.name
-        location            = azurerm_resource_group.lab_1.location
+        resource_group_name = azurerm_resource_group.challenge.name
+        location            = azurerm_resource_group.challenge.location
 
         # Utilize the Web Application Firewall v2 SKU
         sku {
@@ -715,9 +715,9 @@ Once Terraform deploys all the resources, it is time to test the application gat
 
 ### Step 1: Access the frontend public IP and verify it forwards to the backend webserver
 
-1. In the Azure Portal, locate the **terraform_lab_1** resource group, and open the **agw-lab-1** Application gateway resource.
+1. In the Azure Portal, locate the **terraform_challenge** resource group, and open the **agw-** Application gateway resource.
 
-    ![The terraform_lab_1 resources are showin with the agw-lab-1 Application gateway item selected.](media/resourceslist-agw-selected.png "terraform_lab_1 resources")
+    ![The terraform_challenge resources are showin with the agw- Application gateway item selected.](media/resourceslist-agw-selected.png "terraform_challenge resources")
 
 2. On the Overview screen, note the **Frontend public IP address** (it will be different from the value highlighted in the screenshot).
 
