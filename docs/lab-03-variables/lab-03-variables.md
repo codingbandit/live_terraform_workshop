@@ -9,7 +9,7 @@ Split the Terraform implementation into separate files for simple projects. The 
 | main.tf               | Contains the definition of the resources to be deployed and local values.                                                                                         |
 | providers.tf          | Contains the provider definitions, versions, and features.                                                                                                         |
 | variables.tf          | Contains the variable definitions and their default values, do not store sensitive values here                                                                    |
-| <anything>.tfvars | Set variable values described as name/value pairs. These values are read automatically and will replace the default values specified in the variables.tf file. |
+| terraform.tfvars | Set variable values described as name/value pairs. These values are read automatically and will replace the default values specified in the variables.tf file. |
 | output.tf             | Contains output value definitions.|
 
 When using Git source control, leverage a **.gitignore** file. This file ensures that you do not accidentally check-in generated local files and files with potentially sensitive data. For this lab, we will skip this file. However, here is a sample **.gitignore** file as a reference.
@@ -95,12 +95,23 @@ In this lab, we're going to create a resource group and a storage account.  We w
         type        = string
         description = "The base name for the resources in this lab."
         default     = "tflab03"
+
+        validation {
+            condition     = can(regex("^([a-z][a-z0-9]{2,9})$", var.base_name))
+            error_message = "The base name must be all lower case, no symbols or special characters, be between 3 and 10 characters long, and cannot start with a number."
+        }
     }
+
 
     variable "location" {
         type        = string
         description = "The Azure region where the resources in this lab will be deployed."
         default     = "East US"
+
+        validation {
+            condition     = contains(["East US", "East US 2", "West US"], var.location)
+            error_message = "Valid values are East US, East US 2, or West US."
+        }
     }
 
     variable "tags" {
@@ -112,7 +123,11 @@ In this lab, we're going to create a resource group and a storage account.  We w
     }
     ```
 
-3. Save the file.
+    > **Note**: The `can` function will evaluate `true` if there is a pattern match or `false` otherwise. The regex method returns the actual match.
+
+3. Note the validation conditions for `base_name` and `location`. These will ensure that the values provided meet the requirements for the naming conventions and the valid Azure regions for your organization.
+
+4. Save the file.
 
 ## Add the random provider to providers.tf
 
@@ -121,13 +136,21 @@ In this lab, we're going to create a resource group and a storage account.  We w
 2. Open `providers.tf`, and introduce the random provider to the file. In the `terraform.required_providers` block, add the following:
 
     ```hcl
-    random = {
-        source = "hashicorp/random"
-        version = "3.5.1"
+    terraform {
+        required_providers {
+            azurerm = {
+                source  = "hashicorp/azurerm"
+                version = "3.79.0"
+            }
+            random = {
+                source  = "hashicorp/random"
+                version = "3.5.1"
+            }
+        }
     }
     ```
 
-3. Remaining in the providers.tf file, append the following to the provider block at the end of the file:
+3. Remaining in the `providers.tf` file, append the following to the provider block at the end of the file:
 
     ```hcl
     provider "random" {
@@ -139,7 +162,7 @@ In this lab, we're going to create a resource group and a storage account.  We w
 
 ## Establish the main.tf file
 
-1. In Visual Studio Code, create the file `main.tf` in the lab-03-variables folder.
+1. In Visual Studio Code, create the file `main.tf` in the `lab-03-variables` folder.
 
 2. Declare the rules surrounding the generation of the random suffix for the storage account name. We'll generate a suffix of 5 characters in length, and we'll only use lowercase letters to satisfy the naming requirements of storage accounts.
 
@@ -281,17 +304,25 @@ When we applied the configuration, Terraform was using the default values for th
 
 4. In the terminal window, execute the `make validate` command to validate the files.
 
-5. In the terminal window, execute the `terraform plan` command to view the planned changes. Notice how the resources are to be destroyed and recreated in the new location. (Do not apply these changes).  In the `terraform.tfvars`, switch the location back to `East US`.
+5. In the terminal window, execute the `terraform plan` command to view the planned changes. Notice how the resources are to be destroyed and recreated in the new location. (Do not apply these changes).
 
-6. Alternatively, you can send in variable values through the command-line. Execute the following command to override the location variable. Notice the same plan comes up to destroy and recreate the resources in the new region. (Do not apply these changes).
+6. Modify the `terraform.tfvars` file to change the region to an invalid region according to our validation rules:
+
+    ```hcl
+    location = "Central US"
+    ```
+
+7. Execute `terraform plan` command, and notice the validation error.
+
+8. In the `terraform.tfvars` file, switch the location back to `East US`.
+
+9. Alternatively, you can send in variable values through the command-line. Execute the following command to override the location variable. Notice the same plan comes up to destroy and recreate the resources in the new region. (Do not apply these changes).
 
     ```cmd
     terraform plan -var="location=West US"
     ```
 
     >**Note**: command-line variables will take precedence over the `*.tfvars` file.
-
-7. In the terminal window, execute the `terraform destroy` command to remove the deployed resources.
 
 ## Sensitive values
 
