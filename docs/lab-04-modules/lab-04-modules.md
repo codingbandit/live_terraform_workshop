@@ -190,7 +190,7 @@ A module should contain not only the configuration of the resources, it should a
     }
 
     resource "azurerm_linux_web_app" "appsvc" {
-        name                = var.base_name
+        name                = "${var.base_name}${local.storage_suffix}"
         location            = azurerm_resource_group.labrg.location
         resource_group_name = azurerm_resource_group.labrg.name
         service_plan_id     = azurerm_service_plan.appsvc.id
