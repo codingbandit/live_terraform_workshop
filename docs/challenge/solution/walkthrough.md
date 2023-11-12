@@ -1,6 +1,6 @@
-# Lab 1
+# Challenge
 
-- [Lab 1](#)
+- [Challenge](#challenge)
   - [Lesson 1: Visual Studio Code editor experience](#lesson-1-visual-studio-code-editor-experience)
     - [Step 1: Create lab one working folder](#step-1-create-lab-one-working-folder)
     - [Step 2: Install the Terraform extension for Visual Studio Code](#step-2-install-the-terraform-extension-for-visual-studio-code)
@@ -40,7 +40,7 @@
 
 This lab aims to get you acquainted with Terraform and Terraform commands.
 
-The scenario of Lab 1 is to deploy an application gateway to Azure. An Azure Application Gateway is a web traffic load balancer. Traditional load balancers operate at the transport layer (OSI layer 4 - TCP and UDP) and route based on IP address and port. However, an Azure Application Gateway allows routing based on the HTTP request's attributes or host headers (OSI Layer 7 - application layer). For example, the Application Gateway can route URL traffic requesting `/images` to dedicated image servers and a request for `/video` to dedicated video servers [image source](https://docs.microsoft.com/en-us/azure/application-gateway/overview).
+The scenario of the challenge is to deploy an application gateway to Azure. An Azure Application Gateway is a web traffic load balancer. Traditional load balancers operate at the transport layer (OSI layer 4 - TCP and UDP) and route based on IP address and port. However, an Azure Application Gateway allows routing based on the HTTP request's attributes or host headers (OSI Layer 7 - application layer). For example, the Application Gateway can route URL traffic requesting `/images` to dedicated image servers and a request for `/video` to dedicated video servers [image source](https://docs.microsoft.com/en-us/azure/application-gateway/overview).
 
 ![Diagram depicting Layer 7 request routing to image and video server pools based on the incoming request.](media/application_gateway_overview.png "Application Gateway overview")
 
@@ -64,11 +64,11 @@ In order to develop with Terraform a text editor is required. Exercises in this 
 
     ![A portion of the Open Folder dialog displays with the New folder button highlighted on the toolbar menu.](media/new-folder-source-code.png "New folder")
 
-5. Continuing in the **Open Folder** dialog, double-click the **SourceCode** folder you just created. Using the **New folder** button on the toolbar, create a folder named `lab1`.
+5. Continuing in the **Open Folder** dialog, double-click the **SourceCode** folder you just created. Using the **New folder** button on the toolbar, create a folder named `challenge`.
 
-6. Continuing in the **Open Folder** dialog, select the `lab1` folder, and press the **Select Folder** button.
+6. Continuing in the **Open Folder** dialog, select the `challenge` folder, and press the **Select Folder** button.
 
-    ![The Open Folder dialog displays with the lab1 folder highlighted and the Select Folder button selected.](media/open-folder-lab1.png "Open Folder dialog")
+    ![The Open Folder dialog displays with the lab1 folder highlighted and the Select Folder button selected.](media/open-folder-challenge.png "Open Folder dialog")
 
 7. If prompted to trust the authors of the files in this folder, select the **Trust** checkbox and choose the **Yes, I trust the authors** button.
 
@@ -438,7 +438,7 @@ You need a web server (or application server) to serve content. In this scenario
 
     # Allow inbound SSH communication over TCP port 22
     resource "azurerm_network_security_rule" "ssh" {
-        name                        = "Allow SSH"
+        name                        = "AllowSSH"
         priority                    = 512
         direction                   = "Inbound"
         access                      = "Allow"
@@ -677,6 +677,7 @@ The web application firewall uses the [OWASP 3.1 rule set](https://github.com/co
             http_listener_name         = local.listener_name
             backend_address_pool_name  = local.backend_address_pool_name
             backend_http_settings_name = local.http_setting_name
+            priority = 100
         }
 
         # Leverage a predefined SSL policy (TLSv1_1)
