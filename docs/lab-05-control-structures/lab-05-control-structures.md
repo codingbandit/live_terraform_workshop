@@ -36,7 +36,7 @@ Remember, using a data source means we're tapping into an existing resource not 
 
 1. In order to use existing resources within a configuration, you will use a data source. Create a data source that pulls in information about the `lab-05-rg` by appending the following to the `main.tf` file.
 
-    ``hcl
+    ```hcl
     data "azurerm_resource_group" "lab05-rg" {
         name = "lab-05-rg"
     }
